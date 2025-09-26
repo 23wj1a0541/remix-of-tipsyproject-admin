@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1758867347942,
+      "tag": "0000_powerful_longshot",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1758869873186,
+      "tag": "0001_quick_sharon_carter",
+      "breakpoints": true
+    }
+  ]
+}
