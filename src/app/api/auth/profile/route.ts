@@ -46,9 +46,8 @@ export async function GET(request: NextRequest) {
       name: userData.name,
       role: userData.role,
       avatarUrl: userData.avatarUrl,
-      restaurantId: userData.restaurantId,
-      createdAt: userData.createdAt,
-      updatedAt: userData.updatedAt
+      phone: userData.phone,
+      createdAt: userData.createdAt
     };
 
     // Add role-specific data
@@ -85,7 +84,7 @@ export async function GET(request: NextRequest) {
       // Admin-specific data (can be extended as needed)
       profileData.adminData = {
         permissions: ['manage_users', 'manage_restaurants', 'manage_features'],
-        lastLogin: userData.updatedAt
+        lastLogin: userData.createdAt
       };
     }
 
@@ -133,10 +132,8 @@ export async function PUT(request: NextRequest) {
     }
 
     // Extract updatable fields
-    const { name, avatarUrl, passwordHash } = requestBody;
-    const updates: any = {
-      updatedAt: new Date().toISOString()
-    };
+    const { name, avatarUrl, phone } = requestBody;
+    const updates: any = {};
 
     // Validate and add fields if provided
     if (name !== undefined) {
@@ -159,18 +156,18 @@ export async function PUT(request: NextRequest) {
       updates.avatarUrl = avatarUrl;
     }
 
-    if (passwordHash !== undefined) {
-      if (typeof passwordHash !== 'string' || passwordHash.length === 0) {
+    if (phone !== undefined) {
+      if (phone !== null && typeof phone !== 'string') {
         return NextResponse.json({ 
-          error: 'Password hash must be a non-empty string',
-          code: 'INVALID_PASSWORD_HASH' 
+          error: 'Phone must be a string or null',
+          code: 'INVALID_PHONE' 
         }, { status: 400 });
       }
-      updates.passwordHash = passwordHash;
+      updates.phone = phone;
     }
 
     // If no valid updates provided
-    if (Object.keys(updates).length === 1) { // Only updatedAt
+    if (Object.keys(updates).length === 0) {
       return NextResponse.json({ 
         error: 'No valid fields to update',
         code: 'NO_UPDATES_PROVIDED' 
@@ -190,8 +187,8 @@ export async function PUT(request: NextRequest) {
       }, { status: 500 });
     }
 
-    // Return updated profile data (excluding password hash)
-    const { passwordHash: _, ...profileData } = updatedUser[0];
+    // Return updated profile data
+    const profileData = updatedUser[0];
     
     return NextResponse.json(profileData);
 

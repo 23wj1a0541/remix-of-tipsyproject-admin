@@ -39,8 +39,7 @@ export async function GET(request: NextRequest) {
         userName: users.name,
         userAvatarUrl: users.avatarUrl,
         restaurantName: restaurants.name,
-        restaurantAddress: restaurants.address,
-        restaurantCity: restaurants.city
+        restaurantAddress: restaurants.address
       })
       .from(workers)
       .leftJoin(users, eq(workers.userId, users.id))
@@ -54,12 +53,12 @@ export async function GET(request: NextRequest) {
 
       // Get earnings statistics
       const earningsStats = await db.select({
-        totalTips: sum(tips.amount),
+        totalTips: sum(tips.amountCents),
         tipCount: count(tips.id),
-        avgTip: avg(tips.amount)
+        avgTip: avg(tips.amountCents)
       })
       .from(tips)
-      .where(eq(tips.workerId, parseInt(id)));
+      .where(eq(tips.workerUserId, worker[0].userId));
 
       // Get review statistics
       const reviewStats = await db.select({
@@ -67,14 +66,14 @@ export async function GET(request: NextRequest) {
         avgRating: avg(reviews.rating)
       })
       .from(reviews)
-      .where(eq(reviews.workerId, parseInt(id)));
+      .where(eq(reviews.workerUserId, worker[0].userId));
 
       const workerData = {
         ...worker[0],
         earnings: {
-          total: earningsStats[0]?.totalTips || 0,
+          totalCents: earningsStats[0]?.totalTips || 0,
           tipCount: earningsStats[0]?.tipCount || 0,
-          average: earningsStats[0]?.avgTip || 0
+          averageCents: earningsStats[0]?.avgTip || 0
         },
         reviews: {
           total: reviewStats[0]?.totalReviews || 0,
@@ -102,8 +101,7 @@ export async function GET(request: NextRequest) {
       userName: users.name,
       userAvatarUrl: users.avatarUrl,
       restaurantName: restaurants.name,
-      restaurantAddress: restaurants.address,
-      restaurantCity: restaurants.city
+      restaurantAddress: restaurants.address
     })
     .from(workers)
     .leftJoin(users, eq(workers.userId, users.id))
@@ -275,8 +273,7 @@ export async function POST(request: NextRequest) {
       userName: users.name,
       userAvatarUrl: users.avatarUrl,
       restaurantName: restaurants.name,
-      restaurantAddress: restaurants.address,
-      restaurantCity: restaurants.city
+      restaurantAddress: restaurants.address
     })
     .from(workers)
     .leftJoin(users, eq(workers.userId, users.id))
@@ -287,9 +284,9 @@ export async function POST(request: NextRequest) {
     const workerData = {
       ...workerWithDetails[0],
       earnings: {
-        total: 0,
+        totalCents: 0,
         tipCount: 0,
-        average: 0
+        averageCents: 0
       },
       reviews: {
         total: 0,
@@ -387,8 +384,7 @@ export async function PUT(request: NextRequest) {
       userName: users.name,
       userAvatarUrl: users.avatarUrl,
       restaurantName: restaurants.name,
-      restaurantAddress: restaurants.address,
-      restaurantCity: restaurants.city
+      restaurantAddress: restaurants.address
     })
     .from(workers)
     .leftJoin(users, eq(workers.userId, users.id))
@@ -398,12 +394,12 @@ export async function PUT(request: NextRequest) {
 
     // Get earnings statistics
     const earningsStats = await db.select({
-      totalTips: sum(tips.amount),
+      totalTips: sum(tips.amountCents),
       tipCount: count(tips.id),
-      avgTip: avg(tips.amount)
+      avgTip: avg(tips.amountCents)
     })
     .from(tips)
-    .where(eq(tips.workerId, parseInt(id)));
+    .where(eq(tips.workerUserId, workerWithDetails[0].userId));
 
     // Get review statistics
     const reviewStats = await db.select({
@@ -411,14 +407,14 @@ export async function PUT(request: NextRequest) {
       avgRating: avg(reviews.rating)
     })
     .from(reviews)
-    .where(eq(reviews.workerId, parseInt(id)));
+    .where(eq(reviews.workerUserId, workerWithDetails[0].userId));
 
     const workerData = {
       ...workerWithDetails[0],
       earnings: {
-        total: earningsStats[0]?.totalTips || 0,
+        totalCents: earningsStats[0]?.totalTips || 0,
         tipCount: earningsStats[0]?.tipCount || 0,
-        average: earningsStats[0]?.avgTip || 0
+        averageCents: earningsStats[0]?.avgTip || 0
       },
       reviews: {
         total: reviewStats[0]?.totalReviews || 0,

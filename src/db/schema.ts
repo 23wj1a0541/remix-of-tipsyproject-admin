@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, integer, text, real } from 'drizzle-orm/sqlite-core';
 
 // Users table with role-based access and auth mapping
 export const users = sqliteTable('users', {
@@ -142,4 +142,19 @@ export const verification = sqliteTable("verification", {
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(
     () => new Date(),
   ),
+});
+
+// Add workers table
+export const workers = sqliteTable('workers', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: integer('user_id').references(() => users.id).notNull(),
+  restaurantId: integer('restaurant_id').references(() => restaurants.id).notNull(),
+  displayName: text('display_name').notNull(),
+  bio: text('bio'),
+  qrcodeUrl: text('qrcode_url'),
+  upiVpa: text('upi_vpa'),
+  earningsTotal: real('earnings_total').default(0).notNull(),
+  ratingAvg: real('rating_avg').default(0).notNull(),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
 });
